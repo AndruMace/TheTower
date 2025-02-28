@@ -1,0 +1,81 @@
+[gd_scene load_steps=9 format=3 uid="uid://jvw0jvp3kml5"]
+
+[ext_resource type="Shader" path="res://shaders/checker.gdshader" id="1_pr3kd"]
+[ext_resource type="PackedScene" uid="uid://bs72ogkvdd7d6" path="res://addons/proto_controller/proto_controller.tscn" id="1_u7pl6"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_t64i1"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_adbmc"]
+sky_material = SubResource("ProceduralSkyMaterial_t64i1")
+
+[sub_resource type="Environment" id="Environment_5rpew"]
+background_mode = 2
+sky = SubResource("Sky_adbmc")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j7rfl"]
+render_priority = 0
+shader = ExtResource("1_pr3kd")
+shader_parameter/world_uv = false
+shader_parameter/object_uv = false
+shader_parameter/object_uv_scale = Vector2(1, 1)
+shader_parameter/preset_color = 0
+shader_parameter/base_color = Color(0, 0, 0, 1)
+shader_parameter/metalic = 0.25
+shader_parameter/roughness = 0.75
+shader_parameter/grid_scale = 1.0
+shader_parameter/grid_width = 0.01
+shader_parameter/grid_color = Color(0.8, 0.8, 0.8, 1)
+shader_parameter/inside_scale = 1.0
+shader_parameter/inside_width = 0.01
+shader_parameter/inside_color = Color(0.8, 0.8, 0.8, 0.8)
+shader_parameter/checkered = true
+shader_parameter/sub_checkered_grid = false
+shader_parameter/checkered_color = Color(0.25, 0.25, 0.25, 1)
+shader_parameter/checkered_blend_color = 0.1
+shader_parameter/use_inside_uv = false
+shader_parameter/use_albedo_color = false
+shader_parameter/albedo_alpha = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_6v51c"]
+size = Vector3(2, 0.75, 4)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_5qjhw"]
+points = PackedVector3Array(-0.951349, -0.375, -1.87583, 1.06349, 0.41857, 2.03175, 0.983095, -0.375, 1.87583, 1.06349, 0.41857, -2.03175, -1.03175, 0.41857, 2.03175, -1.03175, 0.41857, -2.03175, 0.983095, -0.375, -1.87583, -0.951349, -0.375, 1.87583)
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_5rpew")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+use_collision = true
+size = Vector3(100, 1, 100)
+material = SubResource("ShaderMaterial_j7rfl")
+
+[node name="ProtoController" parent="." instance=ExtResource("1_u7pl6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.900473, 0.5, 1.14509)
+can_sprint = true
+can_freefly = true
+input_left = "move_left"
+input_right = "move_right"
+input_forward = "move_fwd"
+input_back = "move_back"
+input_jump = "jump"
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.89565, 1.03916, -0.630549)
+mesh = SubResource("BoxMesh_6v51c")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.89565, 1.03916, -0.630549)
+shape = SubResource("ConvexPolygonShape3D_5qjhw")
